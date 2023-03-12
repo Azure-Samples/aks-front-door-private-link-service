@@ -1105,6 +1105,15 @@ Get-AzResource -ResourceGroupName <resource-group-name>
 
 When you no longer need the resources you created, just delete the resource group. This will remove all the Azure resources.
 
+```azurecli
+az group delete --name <resource-group-name>
+```
+
+
+```azurepowershell
+Remove-AzResourceGroup -Name <resource-group-name>
+```
+
 ## Next Steps
 
 You could [add a custom domain to your Front Door](https://learn.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain). If you use [Azure DNS](https://learn.microsoft.com/en-us/azure/dns/dns-overview) to manage your domain, you could extend the Bicep modules to automatically create a custom domain for your Front Door and create a CNAME DNS record in your public DNS zone.
