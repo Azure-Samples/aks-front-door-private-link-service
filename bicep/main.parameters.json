@@ -30,12 +30,7 @@
       "value": "azadmin"
     },
     "aksClusterSshPublicKey": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/1a45a694-ae23-4650-9774-89a571c462f6/resourceGroups/BaboKeyVaultResourceGroup/providers/Microsoft.KeyVault/vaults/BaboKeyVault"
-        },
-        "secretName": "aksClusterSshPublicKey"
-      }
+      "value": "<ssh-public-key>"
     },
     "aadProfileManaged": {
       "value": true
@@ -45,7 +40,7 @@
     },
     "aadProfileAdminGroupObjectIDs": {
       "value": [
-        "4e4d0501-e693-4f3e-965b-5bec6c410c03"
+        "<admins-aad-security-group-object-id>"
       ]
     },
     "systemAgentPoolName": {
@@ -156,12 +151,7 @@
       "value": "azadmin"
     },
     "vmAdminPasswordOrKey": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/1a45a694-ae23-4650-9774-89a571c462f6/resourceGroups/BaboKeyVaultResourceGroup/providers/Microsoft.KeyVault/vaults/BaboKeyVault"
-        },
-        "secretName": "vmAdminSshPublicKey"
-      }
+      "value": "<ssh-public-key>"
     },
     "diskStorageAccounType": {
       "value": "Premium_LRS"
@@ -189,7 +179,7 @@
     },
     "keyVaultObjectIds": {
       "value": [
-        "0c5267b2-01f3-4a59-970e-0d9218d5412e"
+        "<aad-security-group-or-account-object-id>"
       ]
     },
     "openServiceMeshEnabled": {

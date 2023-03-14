@@ -5,7 +5,7 @@ template="main.bicep"
 parameters="main.parameters.json"
 
 # AKS cluster name
-prefix="Asti"
+prefix="<Azure-Resource-Name-Prefix>"
 aksName="${prefix}Aks"
 validateTemplate=1
 useWhatIf=0

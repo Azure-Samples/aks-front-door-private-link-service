@@ -79,6 +79,11 @@ The Bicep modules deploy the following Azure resources:
   - [Microsoft.Cdn/profiles/originGroups](https://learn.microsoft.com/en-us/azure/templates/microsoft.cdn/profiles/origingroups?pivots=deployment-language-bicep): an [Origin Group](https://learn.microsoft.com/en-us/azure/frontdoor/origin?pivots=front-door-standard-premium#origin-group) in [Azure Front Door](https://learn.microsoft.com/en-us/azure/frontdoor/front-door-overview) refers to a set of [Origins](https://learn.microsoft.com/en-us/azure/frontdoor/origin?pivots=front-door-standard-premium#origin) that receives similar traffic for their application. You can define the Origin Group as a logical grouping of your application instances across the world that receives the same traffic and responds with an expected behavior. These Origins can be deployed across different regions or within the same region. All origins can be deployed in an Active/Active or Active/Passive configuration.
   - [Microsoft.Cdn/profiles/originGroups/origins](https://learn.microsoft.com/en-us/azure/templates/microsoft.cdn/profiles/origingroups/origins?pivots=deployment-language-bicep): an [Origin](https://learn.microsoft.com/en-us/azure/frontdoor/origin?pivots=front-door-standard-premium#origin) refers to the application deployment exposed via [Azure Front Door](https://learn.microsoft.com/en-us/azure/frontdoor/front-door-overview). An Origin defines properties of the underlying backend application like its type, weight, priority, host header, and more. In this sample, the [Origin](https://learn.microsoft.com/en-us/azure/frontdoor/origin?pivots=front-door-standard-premium#origin) is configured to call the [httpbin](https://httpbin.org/) web application via an [Azure Private Link Service](https://learn.microsoft.com/en-us/azure/private-link/private-link-service-overview).
   - [Microsoft.Cdn/profiles/afdEndpoints](https://learn.microsoft.com/en-us/azure/templates/microsoft.cdn/profiles/afdendpoints?pivots=deployment-language-bicep): in [Azure Front Door Standard/Premium](https://learn.microsoft.com/en-us/azure/frontdoor/front-door-overview), an endpoint is a logical grouping of one or more routes that are associated with domain names. Each endpoint is assigned a domain name by Front Door, and you can associate your own custom domains by using routes.
+  - [Microsoft.Cdn/profiles/securityPolicies](https://learn.microsoft.com/en-us/azure/templates/microsoft.cdn/profiles/securitypolicies?pivots=deployment-language-bicep): a security policy associates a WAF policy to a list of domains and paths. For more information, see [Security and Azure Front Door](https://learn.microsoft.com/en-us/azure/architecture/framework/services/networking/azure-front-door/security).
+  - [Microsoft.Network/FrontDoorWebApplicationFirewallPolicies](https://learn.microsoft.com/en-us/azure/templates/microsoft.network/2019-03-01/frontdoorwebapplicationfirewallpolicies?pivots=deployment-language-bicep): [Azure Web Application Firewall (WAF)](https://learn.microsoft.com/en-us/azure/web-application-firewall/afds/afds-overview) on [Azure Front Door](https://learn.microsoft.com/en-us/azure/frontdoor/front-door-overview) provides centralized protection for your web applications. WAF defends your web services against common exploits and vulnerabilities. It keeps your service highly available for your users and helps you meet compliance requirements. You can configure a WAF policy and associate that policy to one or more Front Door front-ends for protection. The WAF policy deployed by this sample consists of three types of security rules:
+    - [Custom rules](https://learn.microsoft.com/en-us/azure/web-application-firewall/afds/afds-overview#custom-authored-rules) are used to block incoming requests based on the content of the payload, querystring, HTTP request method, IP address of the caller, and more. This sample add a couple of customer rules to block calls coming from a given IP range or calls that contain the word `blockme` in the querystring.
+    - [OWASP](https://owasp.org/) [Azure-managed rule sets](https://learn.microsoft.com/en-us/azure/web-application-firewall/afds/afds-overview#azure-managed-rule-sets) provide an easy way to deploy protection against a common set of security threats like SQL injection or cross-site scripting.
+    - [Bot protection rule set](https://learn.microsoft.com/en-us/azure/web-application-firewall/afds/afds-overview#bot-protection-rule-set) can be used to take custom actions on requests from known bot categories.
 - [Microsoft.Network/privateLinkServices](https://learn.microsoft.com/en-us/azure/templates/microsoft.network/privatelinkservices?pivots=deployment-language-bicep): an [Azure Private Link Service](https://learn.microsoft.com/en-us/azure/private-link/private-link-service-overview) is configured to reference the `kubernetes-internal` internal load balancer of the AKS cluster.
   - [Microsoft.Cdn/profiles/afdEndpoints/routes](https://learn.microsoft.com/en-us/azure/templates/microsoft.cdn/profiles/afdendpoints/routes?pivots=deployment-language-bicep): a route defines properties such as custom domains, http redirect, supported protocols, and origin path that specify how to invoke the backend application. For more information, see [Routing architecture overview](https://learn.microsoft.com/en-us/azure/frontdoor/front-door-routing-architecture?pivots=front-door-standard-premium).
 - [Microsoft.ContainerService/managedClusters](https://learn.microsoft.com/en-us/azure/templates/microsoft.containerservice/managedclusters?pivots=deployment-language-bicep): A public or private AKS cluster composed of a:
@@ -130,7 +135,7 @@ The Bicep modules deploy the following Azure resources:
 
 You can deploy the Bicep modules in the `bicep` folder using the `deploy.sh` Bash script in the same folder. Specify a value for the following parameters in the `deploy.sh` script and `main.parameters.json` parameters file before deploying the Bicep modules.
 
-- `prefix`: specifies a prefix for the AKS cluster and other Azure resources.
+- `prefix`: specifies a prefix for all the Azure resources.
 - `authenticationType`: specifies the type of authentication when accessing the Virtual Machine. `sshPublicKey` is the recommended value. Allowed values: `sshPublicKey` and `password`.
 - `vmAdminUsername`: specifies the name of the administrator account of the virtual machine.
 - `vmAdminPasswordOrKey`: specifies the SSH Key or password for the virtual machine.
@@ -148,7 +153,7 @@ template="main.bicep"
 parameters="main.parameters.json"
 
 # AKS cluster name
-prefix="Asti"
+prefix="<Azure-Resource-Name-Prefix>"
 aksName="${prefix}Aks"
 validateTemplate=1
 useWhatIf=0
@@ -990,13 +995,56 @@ echo '{}' |
 
 As you can note, when deploying the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/intro/overview/) via Helm, the [service.beta.kubernetes.io/azure-load-balancer-internal](https://learn.microsoft.com/en-us/azure/aks/internal-lb#create-an-internal-load-balancer) to create the `kubernetes-internal` internal load balancer in the node resource group of the AKS cluster and expose the ingress controller service via a private IP address.
 
-In this sample, the [httpbin](https://httpbin.org/) web application via YAML templates. In particular, an [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) is used to expose the application via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/intro/overview/) via the HTTP protocol. The ingress object can be easily modified to expose the server via HTTPS and provide a certificate for TLS termination. You can use the [cert-manager](https://cert-manager.io/docs/) to issue a [Let's Encrypt](https://letsencrypt.org/) certificate. For more information, see [Securing NGINX-ingress](https://cert-manager.io/docs/tutorials/acme/nginx-ingress/#issuers). In particular, [cert-manager](https://cert-manager.io/docs/) can create and then delete DNS-01 records in [Azure DNS](https://learn.microsoft.com/en-us/azure/dns/dns-overview) but it needs to authenticate to Azure first. The suggested authentication method is [Managed Identity Using AAD Workload Identity](https://cert-manager.io/docs/configuration/acme/dns01/azuredns/#managed-identity-using-aad-pod-identity).
+In this sample, the [httpbin](https://httpbin.org/) web application via YAML templates. In particular, an [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) is used to expose the application via the [NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/intro/overview/) via the HTTP protocol and using the `httpbin.local` hostname. The ingress object can be easily modified to expose the server via HTTPS and provide a certificate for TLS termination. You can use the [cert-manager](https://cert-manager.io/docs/) to issue a [Let's Encrypt](https://letsencrypt.org/) certificate. For more information, see [Securing NGINX-ingress](https://cert-manager.io/docs/tutorials/acme/nginx-ingress/#issuers). In particular, [cert-manager](https://cert-manager.io/docs/) can create and then delete DNS-01 records in [Azure DNS](https://learn.microsoft.com/en-us/azure/dns/dns-overview) but it needs to authenticate to Azure first. The suggested authentication method is [Managed Identity Using AAD Workload Identity](https://cert-manager.io/docs/configuration/acme/dns01/azuredns/#managed-identity-using-aad-pod-identity).
 
 ## Alternative Solution
 
 [Azure Private Link Service (PLS)](https://learn.microsoft.com/en-us/azure/private-link/private-link-service-overview) is an infrastructure component that allows users to privately connect via an [Azure Private Endpoint (PE)](https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview) in a virtual network in Azure and a Frontend IP Configuration associated with an internal or public [Azure Load Balancer (ALB)](https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-overview). With Private Link, users as service providers can securely provide their services to consumers who can connect from within Azure or on-premises without data exfiltration risks.
 
 Before Private Link Service integration, users who wanted private connectivity from on-premises or other virtual networks to their services in an [Azure Kubernetes Service(AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster were required to create a Private Link Service (PLS) to reference the cluster Azure Load Balancer, like in this sample. The user would then create an [Azure Private Endpoint (PE)](https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview) to connect to the PLS to enable private connectivity. With the [Azure Private Link Service Integration](https://cloud-provider-azure.sigs.k8s.io/topics/pls-integration/) feature, a managed [Azure Private Link Service (PLS)](https://learn.microsoft.com/en-us/azure/private-link/private-link-service-overview) to the AKS cluster load balancer can be created automatically, and the user would only be required to create Private Endpoint connections to it for private connectivity. You can configure a service to be exposed via a Private Link Service just using annotations. For more information, see [Azure Private Link Service Integration](https://cloud-provider-azure.sigs.k8s.io/topics/pls-integration/).
+
+## CI/CD and GitOps Considerations
+
+[Azure Private Link Service Integration](https://cloud-provider-azure.sigs.k8s.io/topics/pls-integration/) simplifies the creation of a [Azure Private Link Service (PLS)](https://learn.microsoft.com/en-us/azure/private-link/private-link-service-overview) when deploying Kubernetes services or ingress controllers via a classic CI/CD pipeline using [Azure DevOps](https://learn.microsoft.com/en-us/azure/aks/devops-pipeline?pivots=pipelines-yaml), [GitHub Actions](https://azure.github.io/kube-labs/1-github-actions.html), [Jenkins](https://learn.microsoft.com/en-us/azure/architecture/solution-ideas/articles/container-cicd-using-jenkins-and-kubernetes-on-azure-container-service), or [GitLab](https://docs.gitlab.com/charts/installation/cloud/aks.html), but even when using a GitOps approach with [Argo CD](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/getting-started-with-gitops-argo-and-azure-kubernetes-service/ba-p/3288595) or [Flux v2](https://learn.microsoft.com/en-us/azure/azure-arc/kubernetes/tutorial-use-gitops-flux2?tabs=azure-cli).
+
+For every workload that you expose via [Azure Private Link Service (PLS)](https://learn.microsoft.com/en-us/azure/private-link/private-link-service-overview) and [Azure Front Door Premium](https://learn.microsoft.com/en-us/azure/frontdoor/front-door-overview), you need to create - [Microsoft.Cdn/profiles/originGroups](https://learn.microsoft.com/en-us/azure/templates/microsoft.cdn/profiles/origingroups?pivots=deployment-language-bicep): an [Origin Group](https://learn.microsoft.com/en-us/azure/frontdoor/origin?pivots=front-door-standard-premium#origin-group), an [Origin](https://learn.microsoft.com/en-us/azure/frontdoor/origin?pivots=front-door-standard-premium#origin), endpoint, a route, and a security policy if you want to protect the workload with a WAF policy. You can accomplish this task by using [az network front-door]([az network front-door](https://learn.microsoft.com/en-us/cli/azure/network/front-door?view=azure-cli-latest)) Azure CLI commands in the CD pipeline used to deploy your service.
+
+## Test the application
+
+If the deployment succeeds, and the private endpoint connection from the [Azure Front Door Premium](https://learn.microsoft.com/en-us/azure/frontdoor/front-door-overview) instance to the [Azure Private Link Service (PLS)](https://learn.microsoft.com/en-us/azure/private-link/private-link-service-overview) is approved, you should be able to access the AKS-hosted [httpbin](https://httpbin.org/) web application as follows:
+
+- Navigate to the overview page of your Front Door Premium in the Azure Portal and copy the URL from the Endpoint hostname, as shown in the following picture
+
+![Azure Front Door Premium in the Azure Portal](images/azure-portal.png)
+
+- Paste and open the URL in your favorite internet browser. You should see the user interface of the [httpbin](https://httpbin.org/) application:
+
+![HTTPBIN application](images/httpbin.png)
+
+You can use the `bicep/calls.sh` Bash script to simulate a few attacks and see the managed rule set and custom rule of the [Azure Web Application Firewall](https://learn.microsoft.com/en-us/azure/web-application-firewall/afds/afds-overview) in action.
+
+```bash
+#!/bin/bash
+
+# Variables
+url="<Front Door Endpoint Hostname URL>"
+
+# Call REST API
+echo "Calling REST API..."
+curl -I -s "$url"
+
+# Simulate SQL injection
+echo "Simulating SQL injection..."
+curl -I -s "${url}?users=ExampleSQLInjection%27%20--"
+
+# Simulate XSS
+echo "Simulating XSS..."
+curl -I -s "${url}?users=ExampleXSS%3Cscript%3Ealert%28%27XSS%27%29%3C%2Fscript%3E"
+
+# A custom rule blocks any request with the word blockme in the querystring.
+echo "Simulating query string manipulation with the 'attack' word in the query string..."
+curl -I -s "${url}?task=blockme"
+```
 
 ## Review deployed resources
 
@@ -1020,4 +1068,4 @@ When you no longer need the resources you created, just delete the resource grou
 
 ## Next Steps
 
-For more information, see [Secure your Origin with Private Link in Azure Front Door Premium](https://learn.microsoft.com/en-us/azure/frontdoor/private-link)
+You could [add a custom domain to your Front Door](https://learn.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain). If you use [Azure DNS](https://learn.microsoft.com/en-us/azure/dns/dns-overview) to manage your domain, you could extend the Bicep modules to automatically create a custom domain for your Front Door and create a CNAME DNS record in your public DNS zone.
