@@ -1105,9 +1105,13 @@ Get-AzResource -ResourceGroupName <resource-group-name>
 
 When you no longer need the resources you created, just delete the resource group. This will remove all the Azure resources.
 
+### Azure CLI
+
 ```azurecli
 az group delete --name <resource-group-name>
 ```
+
+### PowerShell
 
 
 ```azurepowershell
