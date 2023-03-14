@@ -1046,6 +1046,45 @@ echo "Simulating query string manipulation with the 'attack' word in the query s
 curl -I -s "${url}?task=blockme"
 ```
 
+The Bash script should produce the following output, where the first call succeeds, while the remaining one are blocked by the WAF Policy configured in prevention mode.
+
+```Bash
+Calling REST API...
+HTTP/2 200
+content-length: 9593
+content-type: text/html; charset=utf-8
+accept-ranges: bytes
+vary: Accept-Encoding
+access-control-allow-origin: *
+access-control-allow-credentials: true
+x-azure-ref: 05mwQZAAAAADma91JbmU0TJqRqS2lyFurTUlMMzBFREdFMDYwOQA3YTk2NzZiMS0xZmRjLTQ0OWYtYmI1My1hNDUxMDVjNGZmYmM=
+x-cache: CONFIG_NOCACHE
+date: Tue, 14 Mar 2023 12:47:33 GMT
+
+Simulating SQL injection...
+HTTP/2 403
+x-azure-ref: 05mwQZAAAAABaQCSGQToQT4tifYGpmsTmTUlMMzBFREdFMDYxNQA3YTk2NzZiMS0xZmRjLTQ0OWYtYmI1My1hNDUxMDVjNGZmYmM=
+date: Tue, 14 Mar 2023 12:47:34 GMT
+
+Simulating XSS...
+HTTP/2 403
+x-azure-ref: 05mwQZAAAAAAJZzCrTmN4TLY+bZOxskzOTUlMMzBFREdFMDYxMwA3YTk2NzZiMS0xZmRjLTQ0OWYtYmI1My1hNDUxMDVjNGZmYmM=
+date: Tue, 14 Mar 2023 12:47:33 GMT
+
+Simulating query string manipulation with the 'attack' word in the query string...
+HTTP/2 403
+x-azure-ref: 05mwQZAAAAADAle0hOg4FTYH6Q1LHIP50TUlMMzBFREdFMDYyMAA3YTk2NzZiMS0xZmRjLTQ0OWYtYmI1My1hNDUxMDVjNGZmYmM=
+date: Tue, 14 Mar 2023 12:47:33 GMT
+```
+
+[Front Door WAF Policies](https://learn.microsoft.com/en-us/azure/web-application-firewall/afds/afds-overview) and [Application Gateway WAF policies](https://learn.microsoft.com/en-us/azure/web-application-firewall/ag/ag-overview) can be configured to run in the following two modes:
+
+- `Detection mode`: When run in detection mode, WAF doesn't take any other actions other than monitors and logs the request and its matched WAF rule to WAF logs. You can turn on logging diagnostics for Front Door. When you use the portal, go to the Diagnostics section.
+
+- `Prevention mode`: In prevention mode, WAF takes the specified action if a request matches a rule. If a match is found, no further rules with lower priority are evaluated. Any matched requests are also logged in the WAF logs.
+
+For more information, see [Azure Web Application Firewall on Azure Front Door](https://learn.microsoft.com/en-us/azure/web-application-firewall/afds/afds-overview).
+
 ## Review deployed resources
 
 Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
