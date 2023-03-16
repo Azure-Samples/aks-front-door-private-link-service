@@ -317,9 +317,11 @@ spec:
       nodeSelector:
         "kubernetes.io/os": linux
       containers:
-      - image: docker.io/kennethreitz/httpbin
+      - name: httpbin
+        image: docker.io/kennethreitz/httpbin
         imagePullPolicy: IfNotPresent
-        name: httpbin
+        securityContext:
+          allowPrivilegeEscalation: false
         resources:
           requests:
             memory: "64Mi"
