@@ -207,6 +207,9 @@ var podSubnet = {
           addressPrefix: podSubnetAddressPrefix
           privateEndpointNetworkPolicies: 'Disabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
+          natGateway: natGatewayEnabled ? {
+            id: natGateway.id
+          } : null
           delegations: [
             {
               name: 'aks-delegation'
