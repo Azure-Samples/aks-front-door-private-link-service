@@ -15,10 +15,10 @@ param storageAccountName string
 param imagePublisher string = 'Canonical'
 
 @description('Specifies the offer of the platform image or marketplace image used to create the virtual machine.')
-param imageOffer string = 'UbuntuServer'
+param imageOffer string = '0001-com-ubuntu-server-jammy'
 
 @description('Specifies the Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version.')
-param imageSku string = '18.04-LTS'
+param imageSku string = '22_04-lts-gen2'
 
 @description('Specifies the type of authentication when accessing the Virtual Machine. SSH key is recommended.')
 @allowed([
