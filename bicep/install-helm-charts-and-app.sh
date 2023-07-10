@@ -57,7 +57,9 @@ if [[ $private == 'true' ]]; then
 SecRequestBodyAccess On
 SecAuditLog /dev/stdout
 SecAuditLogFormat JSON
-SecAuditEngine RelevantOnly' \
+SecAuditEngine RelevantOnly' 
+SecRuleRemoveById 911100 949110 920350 920420
+SecRule REMOTE_ADDR \"@ipMatch 127.0.0.1\" \"id:87,phase:1,pass,nolog,ctl:ruleEngine=Off\" \
     --set controller.replicaCount=3 \
     --set controller.nodeSelector.\"kubernetes\.io/os\"=linux \
     --set defaultBackend.nodeSelector.\"kubernetes\.io/os\"=linux \
@@ -235,11 +237,14 @@ else
     --namespace ingress-basic \
     --set controller.config.enable-modsecurity=true \
     --set controller.config.enable-owasp-modsecurity-crs=true \
-    --set controller.config.modsecurity-snippet='SecRuleEngine On
+    --set controller.config.modsecurity-snippet=\
+'SecRuleEngine On
 SecRequestBodyAccess On
 SecAuditLog /dev/stdout
 SecAuditLogFormat JSON
-SecAuditEngine RelevantOnly' \
+SecAuditEngine RelevantOnly
+SecRuleRemoveById 911100 949110 920350 920420
+SecRule REMOTE_ADDR "@ipMatch 127.0.0.1" "id:87,phase:1,pass,nolog,ctl:ruleEngine=Off"' \
     --set controller.replicaCount=3 \
     --set controller.nodeSelector."kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux \
