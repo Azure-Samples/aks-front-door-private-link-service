@@ -57,9 +57,6 @@ param dataDiskSize int = 50
 @description('Specifies the caching requirements for the data disks.')
 param dataDiskCaching string = 'ReadWrite'
 
-@description('Specifies the name of the Log Analytics workspace.')
-param workspaceName string
-
 @description('Specifies the location.')
 param location string = resourceGroup().location
 
@@ -162,39 +159,16 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-11-01' = {
   }
 }
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
-  name: workspaceName
-}
-
-resource omsAgentForLinux 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
+resource azureMonitorAgent 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
   parent: virtualMachine
-  name: 'LogAnalytics'
+  name: 'AzureMonitorAgent'
   location: location
   properties: {
-    publisher: 'Microsoft.EnterpriseCloud.Monitoring'
-    type: 'OmsAgentForLinux'
-    typeHandlerVersion: '1.12'
-    settings: {
-      workspaceId: logAnalyticsWorkspace.properties.customerId
-      stopOnMultipleConnections: false
-    }
-    protectedSettings: {
-      workspaceKey:  logAnalyticsWorkspace.listKeys().primarySharedKey //listKeys(logAnalyticsWorkspace.id, logAnalyticsWorkspace.apiVersion).primarySharedKey
-    }
-  }
-}
-
-resource omsDependencyAgentForLinux 'Microsoft.Compute/virtualMachines/extensions@2020-06-01' = {
-  parent: virtualMachine
-  name: 'DependencyAgent'
-  location: location
-  properties: {
-    publisher: 'Microsoft.Azure.Monitoring.DependencyAgent'
-    type: 'DependencyAgentLinux'
-    typeHandlerVersion: '9.10'
+    publisher: 'Microsoft.Azure.Monitor'
+    type: 'AzureMonitorLinuxAgent'
+    typeHandlerVersion: '1.9'
     autoUpgradeMinorVersion: true
+    enableAutomaticUpgrade: true
+    suppressFailures: true
   }
-  dependsOn: [
-    omsAgentForLinux
-  ]
 }

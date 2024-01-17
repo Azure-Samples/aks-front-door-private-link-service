@@ -939,7 +939,6 @@ module virtualMachine 'virtualMachine.bicep' = {
     osDiskSize: osDiskSize
     dataDiskSize: dataDiskSize
     dataDiskCaching: dataDiskCaching
-    workspaceName: workspace.outputs.name
     location: location
     tags: tags
   }
