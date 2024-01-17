@@ -166,20 +166,20 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12
   name: workspaceName
 }
 
-resource omsAgentForLinux 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
+resource azureMonitorAgent 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
   parent: virtualMachine
-  name: 'LogAnalytics'
+  name: 'AzureMonitorAgent'
   location: location
   properties: {
-    publisher: 'Microsoft.EnterpriseCloud.Monitoring'
-    type: 'OmsAgentForLinux'
-    typeHandlerVersion: '1.12'
+    publisher: 'Microsoft.Azure.Monitor'
+    type: 'AzureMonitorLinuxAgent'
+    typeHandlerVersion: '1.9'
+    autoUpgradeMinorVersion: true
     settings: {
       workspaceId: logAnalyticsWorkspace.properties.customerId
-      stopOnMultipleConnections: false
     }
     protectedSettings: {
-      workspaceKey:  logAnalyticsWorkspace.listKeys().primarySharedKey //listKeys(logAnalyticsWorkspace.id, logAnalyticsWorkspace.apiVersion).primarySharedKey
+      workspaceKey: logAnalyticsWorkspace.listKeys().primarySharedKey
     }
   }
 }
@@ -195,6 +195,6 @@ resource omsDependencyAgentForLinux 'Microsoft.Compute/virtualMachines/extension
     autoUpgradeMinorVersion: true
   }
   dependsOn: [
-    omsAgentForLinux
+    azureMonitorAgent
   ]
 }
