@@ -110,9 +110,6 @@ param acrId string
 @description('Specifies the resource id of the Log Analytics workspace.')
 param workspaceId string
 
-@description('Specifies the workspace data retention in days.')
-param retentionInDays int = 60
-
 @description('Specifies the location.')
 param location string = resourceGroup().location
 
@@ -128,10 +125,6 @@ var nsgLogCategories = [
 var nsgLogs = [for category in nsgLogCategories: {
   category: category
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: retentionInDays
-  }
 }]
 var vnetLogCategories = [
   'VMProtectionAlerts'
@@ -142,18 +135,10 @@ var vnetMetricCategories = [
 var vnetLogs = [for category in vnetLogCategories: {
   category: category
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: retentionInDays
-  }
 }]
 var vnetMetrics = [for category in vnetMetricCategories: {
   category: category
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: retentionInDays
-  }
 }]
 var bastionLogCategories = [
   'BastionAuditLogs'
@@ -164,18 +149,10 @@ var bastionMetricCategories = [
 var bastionLogs = [for category in bastionLogCategories: {
   category: category
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: retentionInDays
-  }
 }]
 var bastionMetrics = [for category in bastionMetricCategories: {
   category: category
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: retentionInDays
-  }
 }]
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionPublicIpAddressName = '${bastionHostName}PublicIp'

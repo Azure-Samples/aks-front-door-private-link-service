@@ -11,9 +11,6 @@ param name string
 ])
 param sku string = 'PerNode'
 
-@description('Specifies the workspace data retention in days. -1 means Unlimited retention for the Unlimited Sku. 730 days is the maximum allowed for all other Skus.')
-param retentionInDays int = 60
-
 @description('Specifies the location.')
 param location string = resourceGroup().location
 
@@ -29,7 +26,6 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10
     sku: {
       name: sku
     }
-    retentionInDays: retentionInDays
   }
 }
 
