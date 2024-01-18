@@ -350,9 +350,6 @@ param autoScalerProfileMaxGracefulTerminationSec string = '600'
 @description('Specifies the resource id of the Log Analytics workspace.')
 param workspaceId string
 
-@description('Specifies the workspace data retention in days.')
-param retentionInDays int = 60
-
 @description('Specifies the location.')
 param location string = resourceGroup().location
 
@@ -407,18 +404,10 @@ var metricCategories = [
 var logs = [for category in logCategories: {
   category: category
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: retentionInDays
-  }
 }]
 var metrics = [for category in metricCategories: {
   category: category
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: retentionInDays
-  }
 }]
 
 // Resources

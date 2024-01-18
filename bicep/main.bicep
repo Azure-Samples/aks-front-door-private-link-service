@@ -433,9 +433,6 @@ param logAnalyticsWorkspaceName string = letterCaseType == 'UpperCamelCase' ? '$
 ])
 param logAnalyticsSku string = 'PerNode'
 
-@description('Specifies the workspace data retention in days. -1 means Unlimited retention for the Unlimited Sku. 730 days is the maximum allowed for all other Skus.')
-param logAnalyticsRetentionInDays int = 60
-
 @description('Specifies the name of the virtual machine.')
 param vmName string = 'TestVm'
 
@@ -845,7 +842,6 @@ module workspace 'logAnalytics.bicep' = {
     name: logAnalyticsWorkspaceName
     location: location
     sku: logAnalyticsSku
-    retentionInDays: logAnalyticsRetentionInDays
     tags: tags
   }
 }
@@ -857,7 +853,6 @@ module containerRegistry 'containerRegistry.bicep' = {
     sku: acrSku
     adminUserEnabled: acrAdminUserEnabled
     workspaceId: workspace.outputs.id
-    retentionInDays: logAnalyticsRetentionInDays
     location: location
     tags: tags
   }
@@ -874,7 +869,6 @@ module storageAccount 'storageAccount.bicep' = {
     ]
     keyVaultName: keyVault.outputs.name
     workspaceId: workspace.outputs.id
-    retentionInDays: logAnalyticsRetentionInDays
     location: location
     tags: tags
   }
@@ -915,7 +909,6 @@ module network 'network.bicep' = {
     acrPrivateEndpointName: acrPrivateEndpointName
     acrId: containerRegistry.outputs.id
     workspaceId: workspace.outputs.id
-    retentionInDays: logAnalyticsRetentionInDays
     location: location
     tags: tags
   }
@@ -1070,7 +1063,6 @@ module aksCluster 'aksCluster.bicep' = {
     workloadIdentityEnabled: workloadIdentityEnabled
     oidcIssuerProfileEnabled: oidcIssuerProfileEnabled
     podIdentityProfileEnabled: podIdentityProfileEnabled
-    retentionInDays: logAnalyticsRetentionInDays
     workspaceId: workspace.outputs.id
     location: location
     tags: clusterTags
@@ -1136,7 +1128,6 @@ module frontDoor 'frontDoor.bicep' = {
     wafPolicyRequestBodyCheck: wafPolicyRequestBodyCheck
     securityPolicyName: securityPolicyName
     securityPolicyPatternsToMatch: securityPolicyPatternsToMatch
-    retentionInDays: logAnalyticsRetentionInDays
     workspaceId: workspace.outputs.id
     location: location
     tags: tags

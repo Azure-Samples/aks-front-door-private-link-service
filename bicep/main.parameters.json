@@ -126,9 +126,6 @@
     "logAnalyticsSku": {
       "value": "PerGB2018"
     },
-    "logAnalyticsRetentionInDays": {
-      "value": 60
-    },
     "vmName": {
       "value": "TestVm"
     },
