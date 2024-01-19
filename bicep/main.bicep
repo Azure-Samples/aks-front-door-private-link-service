@@ -472,7 +472,7 @@ param vmAdminPasswordOrKey string
   'Standard_LRS'
   'UltraSSD_LRS'
 ])
-param diskStorageAccounType string = 'Premium_LRS'
+param diskStorageAccountType string = 'Premium_LRS'
 
 @description('Specifies the number of data disks of the virtual machine.')
 @minValue(0)
@@ -934,7 +934,7 @@ module virtualMachine 'virtualMachine.bicep' = {
     authenticationType: authenticationType
     vmAdminUsername: vmAdminUsername
     vmAdminPasswordOrKey: vmAdminPasswordOrKey
-    diskStorageAccounType: diskStorageAccounType
+    diskStorageAccountType: diskStorageAccountType
     numDataDisks: numDataDisks
     osDiskSize: osDiskSize
     dataDiskSize: dataDiskSize
