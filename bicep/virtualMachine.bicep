@@ -41,7 +41,7 @@ param vmAdminPasswordOrKey string
   'Standard_LRS'
   'UltraSSD_LRS'
 ])
-param diskStorageAccounType string = 'Premium_LRS'
+param diskStorageAccountType string = 'Premium_LRS'
 
 @description('Specifies the number of data disks of the virtual machine.')
 @minValue(0)
@@ -132,7 +132,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-11-01' = {
         createOption: 'FromImage'
         diskSizeGB: osDiskSize
         managedDisk: {
-          storageAccountType: diskStorageAccounType
+          storageAccountType: diskStorageAccountType
         }
       }
       dataDisks: [for j in range(0, numDataDisks): {
@@ -142,7 +142,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-11-01' = {
         name: '${vmName}-DataDisk${j}'
         createOption: 'Empty'
         managedDisk: {
-          storageAccountType: diskStorageAccounType
+          storageAccountType: diskStorageAccountType
         }
       }]
     }
